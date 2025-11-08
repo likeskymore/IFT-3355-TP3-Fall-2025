@@ -18,6 +18,20 @@ uniform vec3 lightDirection; //Direction of directional light in world space
 uniform vec3 lightColor; //Color of directional light
 uniform vec3 ambientLightColor; //Color of ambient light
 
+in vec3 vertexCoords;
+in vec3 vertexNormal;
+in vec2 textureCoords;
+
+vec3 computePhong(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, vec3 normal, vec3 light, vec3 eye, vec3 reflection) {
+		vec3 intensityAmbient =  ambientColor * ambientLightColor; 
+
+		vec3 intensityDiffuse = diffuseColor *  lightColor * max(dot(normal,light),0.0); 
+
+		vec3 intensitySpecular = specularColor *  lightColor * pow(max(dot(reflection,eye),0.0),shininess); 
+
+		return intensityAmbient + intensityDiffuse + intensitySpecular;
+}	
+
 void main() {
 	//TODO: PHONG SHADING
 	//Use Phong reflection model
@@ -26,7 +40,15 @@ void main() {
 	//Before applying textures, assume that materialDiffuseColor/materialSpecularColor/materialAmbientColor are the default diffuse/specular/ambient color.
 	//For textures, you can first use texture2D(textureMask, uv) as the billard balls' color to verify correctness, then use mix(...) to re-introduce color.
 	//Finally, mix textureNumberMask too so numbers appear on the billard balls and are black.
+	vec3 normal = normalize(vertexNormal);
+	vec3 light = normalize(mat3(viewMatrix)*(-lightDirection)); 
+	vec3 eye = normalize(-vertexCoords);
+	vec3 reflection = normalize(reflect(-light, normal));
+
+	vec3 phongBlack = computePhong(materialAmbientColor, materialDiffuseColor, materialSpecularColor, normal, light, eye, reflection);
+	vec3 phongWhite = computePhong(maskLightColor, maskLightColor, maskLightColor, normal, light, eye, reflection);
 	
 	//Placeholder color
-	gl_FragColor = vec4(1.0);
+	vec4 blackWhiteMix = mix(vec4(phongBlack, 1.0), vec4(phongWhite, 1.0), texture2D(textureMask, textureCoords));
+	gl_FragColor = mix(vec4(0.0,0.0,0.0, 1.0), blackWhiteMix, texture2D(textureNumberMask, textureCoords));
 }

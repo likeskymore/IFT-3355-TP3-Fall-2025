@@ -26,6 +26,10 @@ uniform vec3 lightDirection; //Direction of directional light in world space
 uniform vec3 lightColor; //Color of directional light
 uniform vec3 ambientLightColor; //Color of ambient light
 
+out vec3 vertexCoords;
+out vec3 vertexNormal;
+out vec2 textureCoords;
+
 void main() {
 	//TODO: PHONG SHADING
 	//Use Phong reflection model
@@ -34,8 +38,13 @@ void main() {
 	//Before applying textures, assume that materialDiffuseColor/materialSpecularColor/materialAmbientColor are the default diffuse/specular/ambient color.
 	//For textures, you can first use texture2D(textureMask, uv) as the billard balls' color to verify correctness, then use mix(...) to re-introduce color.
 	//Finally, mix textureNumberMask too so numbers appear on the billard balls and are black.
-   
+
+	vertexCoords = vec3(modelViewMatrix * vec4(position, 1.0));
+	vertexNormal = normalMatrix * normal;
+	textureCoords = uv;
+
     // Multiply each vertex by the model-view matrix and the projection matrix to get final vertex position
+	
 	vec4 relativeVertexPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * relativeVertexPosition;
 }

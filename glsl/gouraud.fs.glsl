@@ -18,6 +18,10 @@ uniform vec3 lightDirection; //Direction of directional light in world space
 uniform vec3 lightColor; //Color of directional light
 uniform vec3 ambientLightColor; //Color of ambient light
 
+in vec3 gouraudBlack;
+in vec3 gouraudWhite;
+in vec2 textureCoords;
+
 void main() {
 	//TODO: GOURAUD SHADING
 	//Use Phong reflection model
@@ -28,5 +32,6 @@ void main() {
 	//Finally, mix textureNumberMask too so numbers appear on the billard balls and are black.
 	
 	//Placeholder color
-	gl_FragColor = vec4(1.0);
+	vec4 test = mix(vec4(gouraudBlack, 1.0), vec4(gouraudWhite, 1.0), texture2D(textureMask, textureCoords));
+	gl_FragColor = mix(vec4(0.0,0.0,0.0, 1.0),test, texture2D(textureNumberMask, textureCoords));
 }
