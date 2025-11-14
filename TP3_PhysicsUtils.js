@@ -14,12 +14,14 @@ export default {
 	Note: Vectors are always of same size, eg. if p is a Vector2, v will be a Vector2.
 	*/
 	applyMovement(p, v, delta) {
+		
 		/*
 		TODO: Write code here
 
 		Hint: Use p.add(...) to modify the position of objects
 		https://threejs.org/docs/?q=vector#api/en/math/Vector3.add
 		*/
+		p.add(v.clone().multiplyScalar(delta));
 	},
 
 	/* TODO
@@ -33,12 +35,15 @@ export default {
 	sphereObj is a Three.js Object3D (object representation of a sphere)
 	*/
 	applyRotation(dp, sphereRadius, sphereObj) {
+
 		/*
 		TODO: Write code here
 
 		Hint: use sphereObj.rotateOnWorldAxis(...) to rotate the objects
 		https://threejs.org/docs/#api/en/core/Object3D.rotateOnWorldAxis
 		*/
+		sphereObj.rotateOnWorldAxis(dp.clone().cross(dp.clone().set(0.0, 1.0, 0.0)).normalize(), -dp.clone().length()/sphereRadius);
+
 	},
 
 	/* TODO
@@ -54,7 +59,14 @@ export default {
 		/*
 		TODO: Write code here
 		*/
-		return false;
+		let distance = circlePos0.distanceTo(circlePos1);
+		let sumradius = circleRadius * 2;
+
+	    if(distance <= sumradius) {
+			return true;
+		} else {
+			return false;
+		}
 	},
 
 	/* TODO
@@ -71,7 +83,15 @@ export default {
 		/*
 		TODO: Write code here
 		*/
-		return false;
+		let distanceCirclePos0 = circlePos.distanceTo(linePos0);
+		
+		let distanceCirclePos1 = circlePos.distanceTo(linePos1);
+		
+		if(distanceCirclePos0 <= circleRadius || distanceCirclePos1 <= circleRadius) {
+			return true;
+		} else {
+			return false;
+		}
 	},
 
 	/* TODO
@@ -85,10 +105,24 @@ export default {
 	Note: Vectors are always of same size, eg. if circlePos is a Vector2, every other Vector parameter will be a Vector2.
 	*/
 	checkCollisionCircleSegmentInner(circlePos, circleRadius, linePos0, linePos1) {
-		/*
-		TODO: Write code here
-		*/
-		return false;
+		const segment = linePos1.clone().sub(linePos0);
+
+		const circleToPos0 = circlePos.clone().sub(linePos0);
+		const circleToPos1 = circlePos.clone().sub(linePos1);
+
+		const dotProductCircleToPos0 = circleToPos0.dot(segment);
+		const dotProductCircleToPos1 = circleToPos1.dot(segment.clone().negate());
+
+		if (dotProductCircleToPos0 < 0 || dotProductCircleToPos1 < 0) return false;
+
+		const segmentLengthSquared = segment.length() ** 2;
+		const t = dotProductCircleToPos0 / segmentLengthSquared;
+
+		const closest = linePos0.clone().add(segment.clone().multiplyScalar(t));
+
+		const distance = circlePos.distanceTo(closest);
+
+		return distance <= circleRadius;
 	},
 
 	//Applies linear and quadratic friction on velocity using time delta
