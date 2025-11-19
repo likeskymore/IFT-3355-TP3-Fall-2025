@@ -209,12 +209,12 @@ function addSphere(px, py, vx, vy, color, isStriped, number) {
 			sphereMaterial.needsUpdate = true;
 		});
 	} else {
-		shaderLoader.load('glsl/blinnphong.fs.glsl', function(data) {
+		shaderLoader.load('glsl/toon.fs.glsl', function(data) {
 			sphereMaterial.fragmentShader = data;
 			sphereMaterial.needsUpdate = true;
 		});
 
-		shaderLoader.load('glsl/blinnphong.vs.glsl', function(data) {
+		shaderLoader.load('glsl/toon.vs.glsl', function(data) {
 			sphereMaterial.vertexShader = data;
 			sphereMaterial.needsUpdate = true;
 		});
